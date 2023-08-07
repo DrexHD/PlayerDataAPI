@@ -22,7 +22,7 @@ public class PlayerManagerMixin implements PMI {
     private final Map<UUID, Map<PlayerDataStorage<Object>, Object>> pda_playerDataMap = new Object2ObjectOpenHashMap<>();
 
     @Inject(method = "onPlayerConnect", at = @At("HEAD"))
-    private void loadData(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    private void loadData(ClientConnection connection, ServerPlayerEntity player, int latency, CallbackInfo ci) {
         var map = new Object2ObjectOpenHashMap<PlayerDataStorage<Object>, Object>();
         for (PlayerDataStorage<?> storage : PlayerDataApi.getDataStorageSet()) {
             try {
