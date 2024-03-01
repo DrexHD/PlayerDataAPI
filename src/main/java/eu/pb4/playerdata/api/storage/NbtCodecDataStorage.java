@@ -53,7 +53,7 @@ public record NbtCodecDataStorage<T>(String path, Codec<T> codec) implements Pla
             if (!Files.exists(path)) {
                 return null;
             }
-            var nbt = NbtIo.readCompressed(path, NbtTagSizeTracker.ofUnlimitedBytes());
+            var nbt = NbtIo.readCompressed(path, NbtSizeTracker.ofUnlimitedBytes());
             NbtElement element;
             if (nbt.contains("")) {
                 element = nbt.get("");

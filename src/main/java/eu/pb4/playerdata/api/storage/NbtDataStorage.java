@@ -4,7 +4,7 @@ import eu.pb4.playerdata.api.PlayerDataApi;
 import eu.pb4.playerdata.impl.PMI;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtTagSizeTracker;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.MinecraftServer;
 
 import java.nio.file.Files;
@@ -44,7 +44,7 @@ public record NbtDataStorage(String path) implements PlayerDataStorage<NbtCompou
                 return null;
             }
 
-            return NbtIo.readCompressed(path, NbtTagSizeTracker.ofUnlimitedBytes());
+            return NbtIo.readCompressed(path, NbtSizeTracker.ofUnlimitedBytes());
         } catch (Exception e) {
             PMI.LOGGER.error(String.format("Couldn't load player data of %s for path %s", player, this.path));
             e.printStackTrace();

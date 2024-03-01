@@ -21,6 +21,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
@@ -73,7 +74,7 @@ public class BaseGson {
                 .registerTypeHierarchyAdapter(PositionSourceType.class, new RegistrySerializer<>(Registries.POSITION_SOURCE_TYPE))
                 .registerTypeHierarchyAdapter(RuleTestType.class, new RegistrySerializer<>(Registries.RULE_TEST))
                 .registerTypeHierarchyAdapter(RuleBlockEntityModifier.class, new RegistrySerializer<>(Registries.RULE_BLOCK_ENTITY_MODIFIER))
-                .registerTypeHierarchyAdapter(Text.class, new Text.Serializer())
+                .registerTypeHierarchyAdapter(Text.class, new Text.Serializer(DynamicRegistryManager.EMPTY))
                 .registerTypeHierarchyAdapter(Style.class, new CodecSerializer<>(Style.Codecs.CODEC))
                 .registerTypeHierarchyAdapter(ItemStack.class, new CodecSerializer<>(ItemStack.CODEC))
                 .registerTypeHierarchyAdapter(BlockPos.class, new CodecSerializer<>(BlockPos.CODEC))
