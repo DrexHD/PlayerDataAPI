@@ -21,9 +21,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.*;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.structure.rule.RuleTestType;
@@ -47,6 +45,7 @@ import java.util.BitSet;
 
 public class BaseGson {
     public static final Gson GSON = createBuilder().setLenient().create();
+    private static final RegistryWrapper.WrapperLookup WRAPPER_LOOKUP = BuiltinRegistries.createWrapperLookup();
 
     public static GsonBuilder createBuilder() {
         return new GsonBuilder().disableHtmlEscaping()
@@ -74,7 +73,7 @@ public class BaseGson {
                 .registerTypeHierarchyAdapter(PositionSourceType.class, new RegistrySerializer<>(Registries.POSITION_SOURCE_TYPE))
                 .registerTypeHierarchyAdapter(RuleTestType.class, new RegistrySerializer<>(Registries.RULE_TEST))
                 .registerTypeHierarchyAdapter(RuleBlockEntityModifier.class, new RegistrySerializer<>(Registries.RULE_BLOCK_ENTITY_MODIFIER))
-                .registerTypeHierarchyAdapter(Text.class, new Text.Serializer(DynamicRegistryManager.EMPTY))
+                .registerTypeHierarchyAdapter(Text.class, new Text.Serializer(WRAPPER_LOOKUP))
                 .registerTypeHierarchyAdapter(Style.class, new CodecSerializer<>(Style.Codecs.CODEC))
                 .registerTypeHierarchyAdapter(ItemStack.class, new CodecSerializer<>(ItemStack.CODEC))
                 .registerTypeHierarchyAdapter(BlockPos.class, new CodecSerializer<>(BlockPos.CODEC))
@@ -109,7 +108,7 @@ public class BaseGson {
         @Override
         public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                return this.codec.decode(JsonOps.INSTANCE, json).getOrThrow(false, (x) -> {}).getFirst();
+                return this.codec.decode(JsonOps.INSTANCE, json).getOrThrow().getFirst();
             } catch (Throwable e) {
                 return null;
             }
@@ -118,7 +117,7 @@ public class BaseGson {
         @Override
         public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
             try {
-                return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, src).getOrThrow(false, (x) -> {}) : JsonNull.INSTANCE;
+                return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, src).getOrThrow() : JsonNull.INSTANCE;
             } catch (Throwable e) {
                 return JsonNull.INSTANCE;
             }
