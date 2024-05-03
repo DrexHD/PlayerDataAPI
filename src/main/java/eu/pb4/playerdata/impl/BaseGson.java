@@ -22,6 +22,7 @@ import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.*;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.structure.rule.RuleTestType;
@@ -53,7 +54,6 @@ public class BaseGson {
 
                 .registerTypeHierarchyAdapter(Item.class, new RegistrySerializer<>(Registries.ITEM))
                 .registerTypeHierarchyAdapter(Block.class, new RegistrySerializer<>(Registries.BLOCK))
-                .registerTypeHierarchyAdapter(Enchantment.class, new RegistrySerializer<>(Registries.ENCHANTMENT))
                 .registerTypeHierarchyAdapter(SoundEvent.class, new RegistrySerializer<>(Registries.SOUND_EVENT))
                 .registerTypeHierarchyAdapter(StatusEffect.class, new RegistrySerializer<>(Registries.STATUS_EFFECT))
                 .registerTypeHierarchyAdapter(EntityType.class, new RegistrySerializer<>(Registries.ENTITY_TYPE))
@@ -64,7 +64,6 @@ public class BaseGson {
                 .registerTypeHierarchyAdapter(VillagerProfession.class, new RegistrySerializer<>(Registries.VILLAGER_PROFESSION))
                 .registerTypeHierarchyAdapter(Potion.class, new RegistrySerializer<>(Registries.POTION))
                 .registerTypeHierarchyAdapter(ParticleType.class, new RegistrySerializer<>(Registries.PARTICLE_TYPE))
-                .registerTypeHierarchyAdapter(PaintingVariant.class, new RegistrySerializer<>(Registries.PAINTING_VARIANT))
                 .registerTypeHierarchyAdapter(ChunkStatus.class, new RegistrySerializer<>(Registries.CHUNK_STATUS))
                 .registerTypeHierarchyAdapter(ScreenHandlerType.class, new RegistrySerializer<>(Registries.SCREEN_HANDLER))
                 .registerTypeHierarchyAdapter(RecipeType.class, new RegistrySerializer<>(Registries.RECIPE_TYPE))
@@ -74,6 +73,8 @@ public class BaseGson {
                 .registerTypeHierarchyAdapter(RuleTestType.class, new RegistrySerializer<>(Registries.RULE_TEST))
                 .registerTypeHierarchyAdapter(RuleBlockEntityModifier.class, new RegistrySerializer<>(Registries.RULE_BLOCK_ENTITY_MODIFIER))
                 .registerTypeHierarchyAdapter(Text.class, new Text.Serializer(WRAPPER_LOOKUP))
+                .registerTypeHierarchyAdapter(PaintingVariant.class, new RegistryCodecSerializer<>(PaintingVariant.field_51597, RegistryKeys.PAINTING_VARIANT))
+                .registerTypeHierarchyAdapter(Enchantment.class, new RegistryCodecSerializer<>(Enchantment.field_51644, RegistryKeys.ENCHANTMENT))
                 .registerTypeHierarchyAdapter(Style.class, new CodecSerializer<>(Style.Codecs.CODEC))
                 .registerTypeHierarchyAdapter(ItemStack.class, new CodecSerializer<>(ItemStack.CODEC))
                 .registerTypeHierarchyAdapter(BlockPos.class, new CodecSerializer<>(BlockPos.CODEC))
@@ -118,6 +119,26 @@ public class BaseGson {
         public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
             try {
                 return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, src).getOrThrow() : JsonNull.INSTANCE;
+            } catch (Throwable e) {
+                return JsonNull.INSTANCE;
+            }
+        }
+    }
+
+    private record RegistryCodecSerializer<T>(Codec<RegistryEntry<T>> codec, RegistryKey<Registry<T>> registryKey) implements JsonSerializer<T>, JsonDeserializer<T> {
+        @Override
+        public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            try {
+                return this.codec.decode(JsonOps.INSTANCE, json).getOrThrow().getFirst().value();
+            } catch (Throwable e) {
+                return null;
+            }
+        }
+
+        @Override
+        public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+            try {
+                return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, RegistryEntry.of(src)).getOrThrow() : JsonNull.INSTANCE;
             } catch (Throwable e) {
                 return JsonNull.INSTANCE;
             }
