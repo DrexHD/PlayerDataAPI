@@ -109,7 +109,7 @@ public class BaseGson {
         @Override
         public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                return this.codec.decode(JsonOps.INSTANCE, json).getOrThrow().getFirst();
+                return this.codec.decode(WRAPPER_LOOKUP.getOps(JsonOps.INSTANCE), json).getOrThrow().getFirst();
             } catch (Throwable e) {
                 return null;
             }
@@ -118,7 +118,7 @@ public class BaseGson {
         @Override
         public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
             try {
-                return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, src).getOrThrow() : JsonNull.INSTANCE;
+                return src != null ? this.codec.encodeStart(WRAPPER_LOOKUP.getOps(JsonOps.INSTANCE), src).getOrThrow() : JsonNull.INSTANCE;
             } catch (Throwable e) {
                 return JsonNull.INSTANCE;
             }
@@ -129,7 +129,7 @@ public class BaseGson {
         @Override
         public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
-                return this.codec.decode(JsonOps.INSTANCE, json).getOrThrow().getFirst().value();
+                return this.codec.decode(WRAPPER_LOOKUP.getOps(JsonOps.INSTANCE), json).getOrThrow().getFirst().value();
             } catch (Throwable e) {
                 return null;
             }
@@ -138,7 +138,7 @@ public class BaseGson {
         @Override
         public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
             try {
-                return src != null ? this.codec.encodeStart(JsonOps.INSTANCE, RegistryEntry.of(src)).getOrThrow() : JsonNull.INSTANCE;
+                return src != null ? this.codec.encodeStart(WRAPPER_LOOKUP.getOps(JsonOps.INSTANCE), RegistryEntry.of(src)).getOrThrow() : JsonNull.INSTANCE;
             } catch (Throwable e) {
                 return JsonNull.INSTANCE;
             }
